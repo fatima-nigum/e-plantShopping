@@ -1,13 +1,17 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { addItem } from "./CartSlice";
 import "./ProductList.css";
+// src/ProductList.jsx
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addItem } from "./CartSlice"; // ✅ Fixed path
 
 const ProductList = ({ onHomeClick }) => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
 
-  // 🌿 Sample plants data
+  const calculateTotalQuantity = () => {
+    return cartItems ? cartItems.reduce((total, item) => total + item.quantity, 0) : 0;
+  };
+
   const plantsArray = [
     {
       id: 1,
@@ -32,39 +36,34 @@ const ProductList = ({ onHomeClick }) => {
     },
   ];
 
-  // 🛒 Handle Add to Cart
-  const handleAddToCart = (plant) => {
-    dispatch(addItem({ ...plant, quantity: 1 }));
-  };
+  const [addedToCart, setAddedToCart] = useState({});
 
-  // ✅ Check if a plant is already added to cart
-  const isPlantAdded = (plantId) => {
-    return cartItems.some((item) => item.id === plantId);
+  const handleAddToCart = (plant) => {
+    dispatch(addItem(plant));
+    setAddedToCart((prev) => ({ ...prev, [plant.id]: true }));
   };
 
   return (
     <div className="product-page">
       <div className="header">
         <h2>Paradise Nursery Plants</h2>
-        <button className="home-btn" onClick={onHomeClick}>
-          🏠 Home
-        </button>
+        <button className="home-btn" onClick={onHomeClick}>🏠 Home</button>
+        <div className="cart-count">🛒 {calculateTotalQuantity()} items</div>
       </div>
 
       <div className="product-grid">
         {plantsArray.map((plant) => (
           <div key={plant.id} className="product-card">
-            <img src={plant.image} alt={plant.name} className="product-image" />
+            <img src={plant.image} alt={plant.name} />
             <h3>{plant.name}</h3>
             <p>{plant.description}</p>
             <h4>Price: Rs {plant.cost}</h4>
-
             <button
-              className={`add-btn ${isPlantAdded(plant.id) ? "disabled" : ""}`}
+              className="add-btn"
               onClick={() => handleAddToCart(plant)}
-              disabled={isPlantAdded(plant.id)}
+              disabled={addedToCart[plant.id]}
             >
-              {isPlantAdded(plant.id) ? "Added ✅" : "Add to Cart"}
+              {addedToCart[plant.id] ? "Added ✅" : "Add to Cart"}
             </button>
           </div>
         ))}

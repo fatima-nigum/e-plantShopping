@@ -1,120 +1,140 @@
+import "./CartItem.css";
+// src/CartItem.jsx
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { removeItem, updateQuantity } from "./CartSlice";
+import { removeItem, updateQuantity } from "./CartSlice"; // ✅ fixed path
 import { useNavigate } from "react-router-dom";
-import "./CartItem.css";
 
 const CartItem = () => {
   const cartItems = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // ✅ Calculate subtotal for a single item
-  const calculateItemSubtotal = (item) => {
-    const price = parseFloat(item.cost.toString().replace(/[^0-9.]/g, ""));
-    return price * item.quantity;
+  // ✅ Calculate subtotal for one item
+  const calculateTotalCost = (item) => {
+    return item.cost * item.quantity;
   };
 
-  // ✅ Calculate total amount
+  // ✅ Calculate total for all items
   const calculateTotalAmount = () => {
-    return cartItems.reduce((total, item) => total + calculateItemSubtotal(item), 0);
+    return cartItems.reduce((total, item) => total + item.cost * item.quantity, 0);
   };
 
-  // ✅ Handle continue shopping
+  // ✅ Continue Shopping
   const handleContinueShopping = () => {
-    navigate("/"); // Go back to home or product list
+    navigate("/"); // Go back to home / product list page
   };
 
-  // ✅ Handle checkout
+  // ✅ Checkout placeholder
   const handleCheckoutShopping = () => {
-    alert("🛍️ Functionality to be added for future reference");
+    alert("Functionality to be added for future reference");
   };
 
-  // ✅ Handle increment
+  // ✅ Increment quantity
   const handleIncrement = (item) => {
-    dispatch(updateQuantity({ name: item.name, quantity: item.quantity + 1 }));
+    dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }));
   };
 
-  // ✅ Handle decrement (remove if reaches 0)
+  // ✅ Decrement quantity (remove if reaches zero)
   const handleDecrement = (item) => {
     if (item.quantity > 1) {
-      dispatch(updateQuantity({ name: item.name, quantity: item.quantity - 1 }));
+      dispatch(updateQuantity({ id: item.id, quantity: item.quantity - 1 }));
     } else {
-      dispatch(removeItem(item.name));
+      dispatch(removeItem(item.id));
     }
   };
 
-  // ✅ Handle remove
-  const handleRemove = (itemName) => {
-    dispatch(removeItem(itemName));
+  // ✅ Remove item completely
+  const handleRemove = (itemId) => {
+    dispatch(removeItem(itemId));
   };
 
-  // ✅ Total items count (for cart icon, optional)
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-
-  // ✅ Empty cart condition
+  // ✅ Empty cart view
   if (cartItems.length === 0) {
     return (
-      <div className="cart-container">
-        <h2>Your cart is empty 😢</h2>
-        <button onClick={handleContinueShopping} className="get-started-button1">
+      <div className="p-8 text-center">
+        <h2 className="text-2xl font-semibold mb-4">Your cart is empty 🪴</h2>
+        <button
+          onClick={handleContinueShopping}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
           Continue Shopping
         </button>
       </div>
     );
   }
 
+  // ✅ Full cart view
   return (
-    <div className="cart-container">
-      <h2>Your Cart ({totalItems} {totalItems === 1 ? "item" : "items"})</h2>
+    <div className="max-w-3xl mx-auto p-6">
+      <h2 className="text-3xl font-bold mb-6 text-center">Your Cart</h2>
 
-      {cartItems.map((item, index) => (
-        <div key={index} className="cart-item">
-          <img src={item.image} alt={item.name} className="cart-item-image" />
-
-          <div className="cart-item-details">
-            <div className="cart-item-name">{item.name}</div>
-            <div className="cart-item-cost">Price: Rs {item.cost}</div>
-
-            <div className="cart-item-quantity">
-              <button className="cart-item-button" onClick={() => handleDecrement(item)}>
-                -
-              </button>
-              <span className="cart-item-quantity-value">{item.quantity}</span>
-              <button className="cart-item-button" onClick={() => handleIncrement(item)}>
-                +
-              </button>
+      {cartItems.map((item) => (
+        <div
+          key={item.id}
+          className="flex items-center justify-between border-b border-gray-300 py-4"
+        >
+          <div className="flex items-center gap-4">
+            <img
+              src={item.image}
+              alt={item.name}
+              className="w-20 h-20 rounded-lg object-cover"
+            />
+            <div>
+              <h3 className="text-lg font-semibold">{item.name}</h3>
+              <p className="text-gray-500">Rs {item.cost}</p>
+              <div className="flex items-center gap-3 mt-2">
+                <button
+                  className="bg-gray-300 px-2 rounded hover:bg-gray-400"
+                  onClick={() => handleDecrement(item)}
+                >
+                  -
+                </button>
+                <span>{item.quantity}</span>
+                <button
+                  className="bg-gray-300 px-2 rounded hover:bg-gray-400"
+                  onClick={() => handleIncrement(item)}
+                >
+                  +
+                </button>
+              </div>
             </div>
+          </div>
 
-            <div className="cart-item-total">
-              Subtotal: Rs {calculateItemSubtotal(item).toFixed(2)}
-            </div>
-
-            <button className="cart-item-delete" onClick={() => handleRemove(item.name)}>
+          <div className="text-right">
+            <p className="text-gray-700 font-semibold">
+              Subtotal: Rs {calculateTotalCost(item)}
+            </p>
+            <button
+              onClick={() => handleRemove(item.id)}
+              className="text-red-600 hover:text-red-800 text-sm mt-2"
+            >
               Remove
             </button>
           </div>
         </div>
       ))}
 
-      <h3 className="total_cart_amount">
-        Total Amount: Rs {calculateTotalAmount().toFixed(2)}
-      </h3>
+      <div className="text-center mt-8">
+        <h3 className="text-xl font-semibold mb-4">
+          Total Amount: Rs {calculateTotalAmount()}
+        </h3>
 
-      <div className="cart-buttons">
-        <button
-          onClick={handleContinueShopping}
-          className="get-started-button1 continue_shopping_btn"
-        >
-          Continue Shopping
-        </button>
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={handleContinueShopping}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Continue Shopping
+          </button>
 
-        <button
-          onClick={handleCheckoutShopping}
-          className="get-started-button1 checkout_btn"
-        >
-          Checkout
-        </button>
+          <button
+            onClick={handleCheckoutShopping}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Checkout
+          </button>
+        </div>
       </div>
     </div>
   );
