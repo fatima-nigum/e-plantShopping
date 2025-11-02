@@ -1,10 +1,9 @@
-/* LandingPage.css */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  overflow: hidden;
 }
+
 
 .landing-page {
   position: relative;
@@ -133,6 +132,12 @@
     margin-top: 20px; /* Adjust as needed */
     width: 80%; /* Adjust as needed */
   }
+  .store-layout {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 20px;
+}
 }
 
 @media screen and (max-width: 480px) {
@@ -145,3 +150,4 @@
     width: 90%; /* Adjust as needed */
   }
 }
+
