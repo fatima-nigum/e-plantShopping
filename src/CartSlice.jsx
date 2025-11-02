@@ -1,41 +1,41 @@
-// src/CartSlice.jsx
 import { createSlice } from "@reduxjs/toolkit";
-
-const initialState = {
-  cartItems: [], // stores all added plants
-};
 
 const cartSlice = createSlice({
   name: "cart",
-  initialState,
+  initialState: {
+    items: [],
+  },
+
   reducers: {
+    // 🪴 Add item to cart
     addItem: (state, action) => {
-      const existingItem = state.cartItems.find(
-        (item) => item.name === action.payload.name
-      );
+      const { name, image, cost } = action.payload;
+      const existingItem = state.items.find((item) => item.name === name);
       if (existingItem) {
-        existingItem.quantity += 1;
+        existingItem.quantity++;
       } else {
-        state.cartItems.push({ ...action.payload, quantity: 1 });
+        state.items.push({ name, image, cost, quantity: 1 });
       }
     },
+
+    // 🪴 Remove item from cart
     removeItem: (state, action) => {
-      state.cartItems = state.cartItems.filter(
-        (item) => item.name !== action.payload.name
-      );
+      state.items = state.items.filter((item) => item.name !== action.payload);
     },
+
+    // 🪴 Update item quantity
     updateQuantity: (state, action) => {
       const { name, quantity } = action.payload;
-      const item = state.cartItems.find((item) => item.name === name);
-      if (item) {
-        item.quantity = quantity;
+      const itemToUpdate = state.items.find((item) => item.name === name);
+      if (itemToUpdate) {
+        itemToUpdate.quantity = quantity;
       }
-    },
-    clearCart: (state) => {
-      state.cartItems = [];
     },
   },
 });
 
-export const { addItem, removeItem, updateQuantity, clearCart } = cartSlice.actions;
+// ✅ Export action creators for use in components
+export const { addItem, removeItem, updateQuantity } = cartSlice.actions;
+
+// ✅ Export reducer for store.js
 export default cartSlice.reducer;
