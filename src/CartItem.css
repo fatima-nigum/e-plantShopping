@@ -240,4 +240,25 @@
     transition: background-color 0.3s ease;
     margin-top: 40px;
   }
-  
+  .cart-buttons {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.checkout_btn {
+  background-color: #007bff;
+}
+
+.checkout_btn:hover {
+  background-color: #0056b3;
+}
+
+.continue_shopping_btn {
+  background-color: #4caf50;
+}
+
+.continue_shopping_btn:hover {
+  background-color: #3e8e41;
+}

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { addItem } from "./CartSlice";
-
 import "./ProductList.css";
 
 const ProductList = ({ onHomeClick }) => {
   const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.cart.items);
 
-  // 🌿 Sample plants data (you can add more)
+  // 🌿 Sample plants data
   const plantsArray = [
     {
       id: 1,
@@ -32,12 +32,14 @@ const ProductList = ({ onHomeClick }) => {
     },
   ];
 
-  const [addedToCart, setAddedToCart] = useState({});
-
-  // 🛒 Function to handle Add to Cart
+  // 🛒 Handle Add to Cart
   const handleAddToCart = (plant) => {
-    dispatch(addItem(plant));
-    setAddedToCart((prev) => ({ ...prev, [plant.id]: true }));
+    dispatch(addItem({ ...plant, quantity: 1 }));
+  };
+
+  // ✅ Check if a plant is already added to cart
+  const isPlantAdded = (plantId) => {
+    return cartItems.some((item) => item.id === plantId);
   };
 
   return (
@@ -52,16 +54,17 @@ const ProductList = ({ onHomeClick }) => {
       <div className="product-grid">
         {plantsArray.map((plant) => (
           <div key={plant.id} className="product-card">
-            <img src={plant.image} alt={plant.name} />
+            <img src={plant.image} alt={plant.name} className="product-image" />
             <h3>{plant.name}</h3>
             <p>{plant.description}</p>
             <h4>Price: Rs {plant.cost}</h4>
+
             <button
-              className="add-btn"
+              className={`add-btn ${isPlantAdded(plant.id) ? "disabled" : ""}`}
               onClick={() => handleAddToCart(plant)}
-              disabled={addedToCart[plant.id]}
+              disabled={isPlantAdded(plant.id)}
             >
-              {addedToCart[plant.id] ? "Added ✅" : "Add to Cart"}
+              {isPlantAdded(plant.id) ? "Added ✅" : "Add to Cart"}
             </button>
           </div>
         ))}
